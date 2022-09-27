@@ -32,7 +32,7 @@ st.markdown("2. Click on the button to generate the bingo card.")
 st.markdown("3. If you're satisfied, save the bingo card(s).")
 
 ## upload a file here with text 
-uploaded_file = st.file_uploader("Choose a file with text", type="txt")
+uploaded_file = st.file_uploader("Choose a file with text", type="xlsx")
 if uploaded_file is not None:
     df = pd.read_excel(uploaded_file, header=None)
     ## drop duplicates 
@@ -201,7 +201,7 @@ if generate_textual_cards.button("Generate Textual Bingo Card"):
 ## create the save cards button 
 if save_cards.button("Save Bingo Card"):
     ## check if the numeric and textual bingo cards have to be generated 
-    
+
     ## create a directory called bingo_cards, if it exists, delete it 
     if os.path.exists("bingo_cards"):
         shutil.rmtree("bingo_cards")

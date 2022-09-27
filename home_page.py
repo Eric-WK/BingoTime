@@ -210,13 +210,19 @@ if save_cards.button("Save Bingo Card"):
         os.mkdir("bingo_cards")
         ## start generating the bingo cards, each with a new folder 
         for i in range(1, num_cards+1):
-            numeric_bingo_card = run_generator(numeric_textual="numeric")
-            textual_bingo_card = run_generator(numeric_textual="textual")
-            ## create a directory for each bingo card
+            ## make the directory 
             os.mkdir(f"bingo_cards/bingo_card_{i}")
-            ## save the figure to the directory
+            ## create the numeric bingo card
+            numeric_bingo_card = run_generator(numeric_textual="numeric")
+            ## save the numeric bingo card
             numeric_bingo_card.savefig(f"bingo_cards/bingo_card_{i}/bingo_numeric_card_{i}.png")
-            numeric_bingo_card.savefig(f"bingo_cards/bingo_card_{i}/bingo_textual_card_{i}.png")
+            ## clear the figure
+            plt.clf()
+            plt.close()
+            ## create the textual bingo card
+            textual_bingo_card = run_generator(numeric_textual="textual")
+            ## save the figure to the directory
+            textual_bingo_card.savefig(f"bingo_cards/bingo_card_{i}/bingo_textual_card_{i}.png")
         ## create a zip file of the bingo cards
         shutil.make_archive("bingo_cards", "zip", "bingo_cards")
         ## delete the directory of bingo cards

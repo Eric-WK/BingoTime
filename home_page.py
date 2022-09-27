@@ -30,8 +30,6 @@ st.markdown("1. Fill in the desired parameters of the bingo card.")
 st.markdown("2. Click on the button to generate the bingo card.")
 st.markdown("3. If you're satisfied, save the bingo card(s).")
 
-
-
 with st.expander("Parameters"):
     ## parameters
     st.markdown("### Number of Bingo Cards")
@@ -150,22 +148,9 @@ def run_generator():
 if generate_cards.button("Generate Bingo Card"):
     ## generate the bingo card
     this_figure = run_generator()
-    st.pyplot(this_figure)
-
-# if save_cards.button("Save All Bingo Cards"):
-#     holder = []
-#     for i in range(1, num_cards+1):
-#         this_figure = run_generator()
-#         holder.append(this_figure)
-#     ## save the figures to a zipfile
-#     with tempfile.TemporaryDirectory() as tmpdir:
-#         for i, fig in enumerate(holder):
-#             fig.savefig(os.path.join(tmpdir, f"bingo_card_{i}.png"))
-#         with zipfile.ZipFile(os.path.join(tmpdir, "bingo_cards.zip"), "w") as zipf:
-#             for i in range(num_cards):
-#                 zipf.write(os.path.join(tmpdir, f"bingo_card_{i}.png"), f"bingo_card_{i}.png")
-#         st.markdown(get_binary_file_downloader_html(os.path.join(tmpdir, "bingo_cards.zip"), 'Bingo Cards'), unsafe_allow_html=True)
-
+    ## display the figure in a smaller size
+    st.pyplot(this_figure, dpi=100)
+    # st.pyplot(this_figure)
 
 ## create the save cards button 
 if save_cards.button("Save Bingo Card"):
@@ -188,4 +173,4 @@ if save_cards.button("Save Bingo Card"):
     st.markdown(get_binary_file_downloader_html("bingo_cards.zip", 'Bingo Cards'), unsafe_allow_html=True)
     ## delete the zip file
     os.remove("bingo_cards.zip")
-    
+

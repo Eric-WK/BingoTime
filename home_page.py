@@ -152,7 +152,7 @@ def fill_grid_textual(some_ax,numbers_list):
                     txt = " ".join(str(number).split()[:MAX_SIZE]) + "\n" + " ".join(str(number).split()[MAX_SIZE:MAX_SIZE*2]) + "\n" + " ".join(str(number).split()[MAX_SIZE*2:])
                 else:
                     txt = str(number)
-                some_ax.text(x+0.5, y+0.5, txt, horizontalalignment='center', verticalalignment='center', fontsize=14)
+                some_ax.text(x+0.5, y+0.5, txt, horizontalalignment='center', verticalalignment='center', fontsize=10)
                 numbers = numbers[1:]
     return some_ax
 
@@ -163,7 +163,7 @@ def get_binary_file_downloader_html(bin_file, file_label='File'):
     href = f'<a href="data:application/octet-stream;base64,{bin_str}" download="{os.path.basename(bin_file)}">Download {file_label}</a>'
     return href
 
-def run_generator():
+def run_generator(numeric_textual:str):
     bingo_card = create_bingo_card()
     ## color the free slot
     free_slot_color = get_random_color()
@@ -172,7 +172,10 @@ def run_generator():
     text_free_slot(bingo_card, free_space_value)
     ## fill the grid with random numbers
     numbers = get_random_numbers()
-    fill_grid(bingo_card, numbers)
+    if numeric_textual == "numeric":
+        fill_grid(bingo_card,numbers)
+    elif numeric_textual == "textual":
+        fill_grid_textual(bingo_card,numbers)
     this_figure = bingo_card.figure
     return this_figure
 
@@ -184,7 +187,7 @@ generate_numeric_cards,generate_textual_cards,save_cards = st.columns(3)
 ## button to generate the bingo card
 if generate_numeric_cards.button("Generate Numeric Bingo Card"):
     ## generate the bingo card
-    this_figure = run_generator()
+    this_figure = run_generator(numeric_textual="numeric")
     ## display the figure in a smaller size
     st.pyplot(this_figure, dpi=100)
     # st.pyplot(this_figure)
@@ -192,7 +195,7 @@ if generate_numeric_cards.button("Generate Numeric Bingo Card"):
 ## button to generate the bingo card
 if generate_textual_cards.button("Generate Textual Bingo Card"):
     ## generate the bingo card
-    this_figure = run_generator()
+    this_figure = run_generator(numeric_textual="textual")
     ## display the figure in a smaller size
     st.pyplot(this_figure, dpi=100)
     # st.pyplot(this_figure)
@@ -208,11 +211,13 @@ if save_cards.button("Save Bingo Card"):
     os.mkdir("bingo_cards")
     ## start generating the bingo cards, each with a new folder 
     for i in range(1, num_cards+1):
-        this_figure = run_generator()
+        numeric_bingo_card = run_generator(numeric_textual="numeric")
+        textual_bingo_card = run_generator(numeric_textual="textual")
         ## create a directory for each bingo card
         os.mkdir(f"bingo_cards/bingo_card_{i}")
         ## save the figure to the directory
-        this_figure.savefig(f"bingo_cards/bingo_card_{i}/bingo_card_{i}.png")
+        numeric_bingo_card.savefig(f"bingo_cards/bingo_card_{i}/bingo_numeric_card_{i}.png")
+        numeric_bingo_card.savefig(f"bingo_cards/bingo_card_{i}/bingo_textual_card_{i}.png")
     ## create a zip file of the bingo cards
     shutil.make_archive("bingo_cards", "zip", "bingo_cards")
     ## delete the directory of bingo cards

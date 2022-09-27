@@ -1,6 +1,11 @@
+import shutil
 import streamlit as st 
 import matplotlib.pyplot as plt
 import numpy as np
+import zipfile
+import os
+import base64
+import tempfile 
 
 ## for the warnings
 st.set_option('deprecation.showPyplotGlobalUse', False)
@@ -27,24 +32,28 @@ st.markdown("3. If you're satisfied, save the bingo card(s).")
 
 
 
-## parameters
-st.markdown("## Parameters")
-st.markdown("### Number of Bingo Cards")
-num_cards = st.number_input("Number of Bingo Cards", min_value=1, max_value=200, value=1, step=1)
+with st.expander("Parameters"):
+    ## parameters
+    st.markdown("### Number of Bingo Cards")
+    num_cards = st.number_input("Number of Bingo Cards", min_value=1, max_value=200, value=1, step=1)
+    ## number of rows and columns
+    st.markdown("### Number of Rows and Columns")
+    ## make columns so it fits on the page
+    col1, col2 = st.columns(2)
+    num_rows = col1.number_input("Number of Rows", min_value=1, max_value=10, value=5, step=1)
+    num_cols = col2.number_input("Number of Columns", min_value=1, max_value=10, value=5, step=1)
 
+    ## minimum and maximum values
+    st.markdown("### Minimum and Maximum Values")
+    col3, col4 = st.columns(2)
+    min_val = col3.number_input("Minimum Value", min_value=1, max_value=101, value=1, step=1)
+    max_val = col4.number_input("Maximum Value", min_value=1, max_value=101, value=101, step=1)
+    
+    ## colors 
+    st.markdown("### Colors")
+    ## show a set of colors which are pre-defined options
+    colors = ["#871882", "#17DDBF", "#FF8850", "#CCE161"]
 
-## number of rows and columns
-st.markdown("### Number of Rows and Columns")
-## make columns so it fits on the page
-col1, col2 = st.columns(2)
-num_rows = col1.number_input("Number of Rows", min_value=1, max_value=10, value=5, step=1)
-num_cols = col2.number_input("Number of Columns", min_value=1, max_value=10, value=5, step=1)
-
-## minimum and maximum values
-st.markdown("### Minimum and Maximum Values")
-col3, col4 = st.columns(2)
-min_val = col3.number_input("Minimum Value", min_value=1, max_value=101, value=1, step=1)
-max_val = col4.number_input("Maximum Value", min_value=1, max_value=101, value=101, step=1)
 
 
 ## advanced options 
@@ -64,4 +73,119 @@ with st.expander("Advanced Options"):
     colc.markdown("#### Free Space Location")
     colc.write("This is the location of the free space on the bingo card.")
     colc.write("The default value is 'center'. (number of rows modulo 2)")
-    free_space_coordinates = colc.number_input("Free Space Location", min_value=1, max_value=100, value=num_rows // 2, step=1)
+    free_space_coordinates = (num_cols//2, num_rows//2)
+
+## CONSTANTS
+FIGURE_SIZE = (num_cols * spacing_multiplier, num_rows * spacing_multiplier)
+TOTAL_NUMBERS = num_cols * num_rows - 1
+
+def create_bingo_card():
+    ## CREATING THE FIGURE 
+    fig = plt.figure(figsize=FIGURE_SIZE)
+    ax = fig.add_subplot(111)
+
+    ## MAKING THE GRID
+    for x in range(num_cols):
+        for y in range(num_rows):
+            ax.plot([x, x+1], [y, y], color='black')
+            ax.plot([x, x], [y, y+1], color='black')
+            ax.plot([x+1, x+1], [y, y+1], color='black')
+            ax.plot([x, x+1], [y+1, y+1], color='black')
+    ax.axis('off')
+    return ax
+
+def get_random_color():
+    return np.random.choice(colors)
+
+def color_free_slot(some_ax,color):
+    some_ax.add_patch(plt.Rectangle((free_space_coordinates[0], free_space_coordinates[1]), 1, 1, color=color))
+
+def text_free_slot(some_ax, text):
+    some_ax.text(free_space_coordinates[0]+0.5, free_space_coordinates[1]+0.5, text, horizontalalignment='center', verticalalignment='center', fontsize=20)
+
+def get_random_numbers():
+    my_numbers = np.random.choice(np.arange(min_val,max_val), size=TOTAL_NUMBERS, replace=False)
+    np.random.shuffle(my_numbers)
+    return my_numbers
+
+def fill_grid(some_ax,numbers_list):
+    ## FILLING THE GRID
+    numbers = numbers_list
+    for x in range(num_cols):
+        for y in range(num_rows):
+            if (x, y) != free_space_coordinates:
+                ## choose a random number from the list numbers and remove it from the list
+                number = numbers[0]
+                ## make sure that the same color is not used twice in adjacent cells
+                some_ax.text(x+0.5, y+0.5, number, horizontalalignment='center', verticalalignment='center', fontsize=20)
+                numbers = numbers[1:]
+
+
+def get_binary_file_downloader_html(bin_file, file_label='File'):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    bin_str = base64.b64encode(data).decode()
+    href = f'<a href="data:application/octet-stream;base64,{bin_str}" download="{os.path.basename(bin_file)}">Download {file_label}</a>'
+    return href
+
+
+## create 3 columns 
+generate_cards, save_cards = st.columns(2)
+
+def run_generator():
+    bingo_card = create_bingo_card()
+    ## color the free slot
+    free_slot_color = get_random_color()
+    color_free_slot(bingo_card, free_slot_color)
+    ## add text to the free slot
+    text_free_slot(bingo_card, free_space_value)
+    ## fill the grid with random numbers
+    numbers = get_random_numbers()
+    fill_grid(bingo_card, numbers)
+    this_figure = bingo_card.figure
+    return this_figure
+
+
+## button to generate the bingo card
+if generate_cards.button("Generate Bingo Card"):
+    ## generate the bingo card
+    this_figure = run_generator()
+    st.pyplot(this_figure)
+
+# if save_cards.button("Save All Bingo Cards"):
+#     holder = []
+#     for i in range(1, num_cards+1):
+#         this_figure = run_generator()
+#         holder.append(this_figure)
+#     ## save the figures to a zipfile
+#     with tempfile.TemporaryDirectory() as tmpdir:
+#         for i, fig in enumerate(holder):
+#             fig.savefig(os.path.join(tmpdir, f"bingo_card_{i}.png"))
+#         with zipfile.ZipFile(os.path.join(tmpdir, "bingo_cards.zip"), "w") as zipf:
+#             for i in range(num_cards):
+#                 zipf.write(os.path.join(tmpdir, f"bingo_card_{i}.png"), f"bingo_card_{i}.png")
+#         st.markdown(get_binary_file_downloader_html(os.path.join(tmpdir, "bingo_cards.zip"), 'Bingo Cards'), unsafe_allow_html=True)
+
+
+## create the save cards button 
+if save_cards.button("Save Bingo Card"):
+    ## create a directory called bingo_cards, if it exists, delete it 
+    if os.path.exists("bingo_cards"):
+        shutil.rmtree("bingo_cards")
+    os.mkdir("bingo_cards")
+    ## start generating the bingo cards, each with a new folder 
+    for i in range(1, num_cards+1):
+        this_figure = run_generator()
+        ## create a directory for each bingo card
+        os.mkdir(f"bingo_cards/bingo_card_{i}")
+        ## save the figure to the directory
+        this_figure.savefig(f"bingo_cards/bingo_card_{i}/bingo_card_{i}.png")
+    ## create a zip file of the bingo cards
+    shutil.make_archive("bingo_cards", "zip", "bingo_cards")
+    ## delete the directory of bingo cards
+    shutil.rmtree("bingo_cards")
+    ## download the zip file
+    st.markdown(get_binary_file_downloader_html("bingo_cards.zip", 'Bingo Cards'), unsafe_allow_html=True)
+    ## delete the zip file
+    os.remove("bingo_cards.zip")
+    

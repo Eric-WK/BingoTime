@@ -40,6 +40,10 @@ if uploaded_file is not None:
     ## now get the text from the file
     prompts = df[0].tolist()
 
+## show the number of prompts in the file
+if uploaded_file is not None:
+    st.markdown(f"### There are {len(prompts)} prompts in the file.")
+
 
 with st.expander("Parameters"):
     ## parameters
@@ -134,24 +138,24 @@ def fill_grid(some_ax,numbers_list):
                 some_ax.text(x+0.5, y+0.5, number, horizontalalignment='center', verticalalignment='center', fontsize=20)
                 numbers = numbers[1:]
 
-def fill_grid_textual(some_ax,numbers_list):
+def fill_grid_textual(some_ax,text_list):
     ## FILLING THE GRID
-    numbers = numbers_list
+    texts = text_list
     for x in range(num_cols):
         for y in range(num_rows):
             if (x, y) != free_space_coordinates:
-                ## choose a random number from the list numbers and remove it from the list
-                number = numbers[0]
+                ## choose a random number from the list texts and remove it from the list
+                the_text = texts[0]
                 ## make sure that the same color is not used twice in adjacent cells
                 ## if the text is longer than 4 words, but less than 6 words, split it into two lines and make the font smaller
-                if len(str(number).split()) > MAX_SIZE and len(str(number).split()) <= MAX_SIZE*2:
+                if len(str(the_text).split()) > MAX_SIZE and len(str(the_text).split()) <= MAX_SIZE*2:
                     ## join the text with a newline between the words 
-                    txt = " ".join(str(number).split()[:MAX_SIZE]) + "\n" + " ".join(str(number).split()[MAX_SIZE:])
+                    txt = " ".join(str(the_text).split()[:MAX_SIZE]) + "\n" + " ".join(str(the_text).split()[MAX_SIZE:])
                 ## if it is greater than 6 words, split it into three lines and make the font even smaller
-                elif len(str(number).split()) > MAX_SIZE*2:
-                    txt = " ".join(str(number).split()[:MAX_SIZE]) + "\n" + " ".join(str(number).split()[MAX_SIZE:MAX_SIZE*2]) + "\n" + " ".join(str(number).split()[MAX_SIZE*2:])
+                elif len(str(the_text).split()) > MAX_SIZE*2:
+                    txt = " ".join(str(the_text).split()[:MAX_SIZE]) + "\n" + " ".join(str(the_text).split()[MAX_SIZE:MAX_SIZE*2]) + "\n" + " ".join(str(the_text).split()[MAX_SIZE*2:])
                 else:
-                    txt = str(number)
+                    txt = str(the_text)
                 some_ax.text(x+0.5, y+0.5, txt, horizontalalignment='center', verticalalignment='center', fontsize=10)
                 numbers = numbers[1:]
     return some_ax
@@ -175,6 +179,8 @@ def run_generator(numeric_textual:str):
     if numeric_textual == "numeric":
         fill_grid(bingo_card,numbers)
     elif numeric_textual == "textual":
+        ## shuffle the list of words
+        np.random.shuffle(prompts)
         fill_grid_textual(bingo_card,prompts)
     this_figure = bingo_card.figure
     return this_figure
@@ -185,25 +191,23 @@ generate_numeric_cards,generate_textual_cards,save_cards = st.columns(3)
 
 
 ## button to generate the bingo card
-if generate_numeric_cards.button("Generate Numeric Bingo Card"):
+if generate_numeric_cards.button("Preview: Numeric Bingo Card"):
     ## generate the bingo card
     this_figure = run_generator(numeric_textual="numeric")
     ## display the figure in a smaller size
     st.pyplot(this_figure, dpi=100)
-    # st.pyplot(this_figure)
 
 ## button to generate the bingo card
-if generate_textual_cards.button("Generate Textual Bingo Card"):
+if generate_textual_cards.button("Preview: Textual Bingo Card"):
     ## generate the bingo card
     this_figure = run_generator(numeric_textual="textual")
     ## display the figure in a smaller size
     st.pyplot(this_figure, dpi=100)
-    # st.pyplot(this_figure)
 
 
 ## create the save cards button 
 if save_cards.button("Save Bingo Card"):
-    with st.spinner("Saving the bingo card..."):
+    with st.spinner("Saving the bingo cards..."):
         ## create a directory called bingo_cards, if it exists, delete it 
         if os.path.exists("bingo_cards"):
             shutil.rmtree("bingo_cards")

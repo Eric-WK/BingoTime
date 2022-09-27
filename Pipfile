@@ -11,6 +11,7 @@ transformers = "*"
 torch = "*"
 streamlit = "*"
 openpyxl = "*"
+protobuf = "*"
 
 [dev-packages]
 ipykernel = "*"

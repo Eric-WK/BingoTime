@@ -236,8 +236,10 @@ if save_cards.button("Save Bingo Card"):
         shutil.make_archive("bingo_cards", "zip", "bingo_cards")
         ## delete the directory of bingo cards
         shutil.rmtree("bingo_cards")
+        ## 3 columns 
+        _, download_bingo_cards, _ = st.columns(3)
         ## download the zip file
-        st.markdown(get_binary_file_downloader_html("bingo_cards.zip", 'Bingo Cards'), unsafe_allow_html=True)
+        download_bingo_cards.markdown(get_binary_file_downloader_html("bingo_cards.zip", 'Bingo Cards'), unsafe_allow_html=True)
         ## delete the zip file
         os.remove("bingo_cards.zip")
     ## success 

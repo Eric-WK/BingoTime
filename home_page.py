@@ -50,9 +50,9 @@ with st.expander("Parameters"):
     ## parameters
     st.markdown("### Number of Bingo Cards")
     if uploaded_file is not None:
-        num_cards = st.slider("Number of Bingo Cards", 1, default_num_cards, default_num_cards)
+        num_cards = st.number_input("Number of Bingo Cards", min_value = 1, max_value = 200, value = default_num_cards, step = 1)
     else:
-        num_cards = st.number_input("Number of Bingo Cards", min_value=1, max_value=200, value=default_num_cards, step=1)
+        num_cards = st.number_input("Number of Bingo Cards", min_value=1, max_value=200, value=10, step=1)
     ## number of rows and columns
     st.markdown("### Number of Rows and Columns")
     ## make columns so it fits on the page

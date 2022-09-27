@@ -42,7 +42,7 @@ if uploaded_file is not None:
 
 ## show the number of prompts in the file
 if uploaded_file is not None:
-    st.markdown(f"### There are {len(prompts)} prompts in the file.")
+    st.info(f"There are {len(prompts)} prompts in the file.")
 
 
 with st.expander("Parameters"):
@@ -83,9 +83,10 @@ with st.expander("Advanced Options"):
     colb.write("The default value is 'FREE'.")
     free_space_value = colb.text_input("Free Space Value", value="FREE")
     ## free space location
-    colc.markdown("Free Space Location")
-    colc.write("This is the location of the free space on the bingo card.")
-    colc.write("The default value is 'center'. (number of rows modulo 2)")
+    colc.markdown("Font Size")
+    colc.write("This is the font size of the text on the bingo card.")
+    colc.write("The default value is 10.")
+    font_size = colc.number_input("Font Size", min_value=1, max_value=100, value=10, step=1)
     free_space_coordinates = (num_cols//2, num_rows//2)
     ## maximum size for text 
     cold.markdown("Maximum Size for Text")
@@ -156,7 +157,7 @@ def fill_grid_textual(some_ax,text_list):
                     txt = " ".join(str(the_text).split()[:MAX_SIZE]) + "\n" + " ".join(str(the_text).split()[MAX_SIZE:MAX_SIZE*2]) + "\n" + " ".join(str(the_text).split()[MAX_SIZE*2:])
                 else:
                     txt = str(the_text)
-                some_ax.text(x+0.5, y+0.5, txt, horizontalalignment='center', verticalalignment='center', fontsize=10)
+                some_ax.text(x+0.5, y+0.5, txt, horizontalalignment='center', verticalalignment='center', fontsize=font_size)
                 texts = texts[1:]
     return some_ax
 

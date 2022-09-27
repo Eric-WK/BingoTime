@@ -157,7 +157,7 @@ def fill_grid_textual(some_ax,text_list):
                 else:
                     txt = str(the_text)
                 some_ax.text(x+0.5, y+0.5, txt, horizontalalignment='center', verticalalignment='center', fontsize=10)
-                numbers = numbers[1:]
+                texts = texts[1:]
     return some_ax
 
 def get_binary_file_downloader_html(bin_file, file_label='File'):

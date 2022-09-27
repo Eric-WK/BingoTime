@@ -175,7 +175,7 @@ def run_generator(numeric_textual:str):
     if numeric_textual == "numeric":
         fill_grid(bingo_card,numbers)
     elif numeric_textual == "textual":
-        fill_grid_textual(bingo_card,numbers)
+        fill_grid_textual(bingo_card,prompts)
     this_figure = bingo_card.figure
     return this_figure
 
@@ -203,27 +203,30 @@ if generate_textual_cards.button("Generate Textual Bingo Card"):
 
 ## create the save cards button 
 if save_cards.button("Save Bingo Card"):
-    ## check if the numeric and textual bingo cards have to be generated 
-
-    ## create a directory called bingo_cards, if it exists, delete it 
-    if os.path.exists("bingo_cards"):
+    with st.spinner("Saving the bingo card..."):
+        ## create a directory called bingo_cards, if it exists, delete it 
+        if os.path.exists("bingo_cards"):
+            shutil.rmtree("bingo_cards")
+        os.mkdir("bingo_cards")
+        ## start generating the bingo cards, each with a new folder 
+        for i in range(1, num_cards+1):
+            numeric_bingo_card = run_generator(numeric_textual="numeric")
+            textual_bingo_card = run_generator(numeric_textual="textual")
+            ## create a directory for each bingo card
+            os.mkdir(f"bingo_cards/bingo_card_{i}")
+            ## save the figure to the directory
+            numeric_bingo_card.savefig(f"bingo_cards/bingo_card_{i}/bingo_numeric_card_{i}.png")
+            numeric_bingo_card.savefig(f"bingo_cards/bingo_card_{i}/bingo_textual_card_{i}.png")
+        ## create a zip file of the bingo cards
+        shutil.make_archive("bingo_cards", "zip", "bingo_cards")
+        ## delete the directory of bingo cards
         shutil.rmtree("bingo_cards")
-    os.mkdir("bingo_cards")
-    ## start generating the bingo cards, each with a new folder 
-    for i in range(1, num_cards+1):
-        numeric_bingo_card = run_generator(numeric_textual="numeric")
-        textual_bingo_card = run_generator(numeric_textual="textual")
-        ## create a directory for each bingo card
-        os.mkdir(f"bingo_cards/bingo_card_{i}")
-        ## save the figure to the directory
-        numeric_bingo_card.savefig(f"bingo_cards/bingo_card_{i}/bingo_numeric_card_{i}.png")
-        numeric_bingo_card.savefig(f"bingo_cards/bingo_card_{i}/bingo_textual_card_{i}.png")
-    ## create a zip file of the bingo cards
-    shutil.make_archive("bingo_cards", "zip", "bingo_cards")
-    ## delete the directory of bingo cards
-    shutil.rmtree("bingo_cards")
-    ## download the zip file
-    st.markdown(get_binary_file_downloader_html("bingo_cards.zip", 'Bingo Cards'), unsafe_allow_html=True)
-    ## delete the zip file
-    os.remove("bingo_cards.zip")
+        ## download the zip file
+        st.markdown(get_binary_file_downloader_html("bingo_cards.zip", 'Bingo Cards'), unsafe_allow_html=True)
+        ## delete the zip file
+        os.remove("bingo_cards.zip")
+    ## success 
+    st.success("Bingo cards saved!")
+    ## balloon notification
+    st.balloons()
 

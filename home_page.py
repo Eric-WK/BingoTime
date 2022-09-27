@@ -43,12 +43,16 @@ if uploaded_file is not None:
 ## show the number of prompts in the file
 if uploaded_file is not None:
     st.info(f"There are {len(prompts)} prompts in the file.")
+    default_num_cards = len(prompts)
 
 
 with st.expander("Parameters"):
     ## parameters
     st.markdown("### Number of Bingo Cards")
-    num_cards = st.number_input("Number of Bingo Cards", min_value=1, max_value=200, value=len(prompts), step=1)
+    if uploaded_file is not None:
+        num_cards = st.slider("Number of Bingo Cards", 1, default_num_cards, default_num_cards)
+    else:
+        num_cards = st.number_input("Number of Bingo Cards", min_value=1, max_value=200, value=default_num_cards, step=1)
     ## number of rows and columns
     st.markdown("### Number of Rows and Columns")
     ## make columns so it fits on the page

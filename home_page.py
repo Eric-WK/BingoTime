@@ -48,7 +48,7 @@ if uploaded_file is not None:
 with st.expander("Parameters"):
     ## parameters
     st.markdown("### Number of Bingo Cards")
-    num_cards = st.number_input("Number of Bingo Cards", min_value=1, max_value=200, value=1, step=1)
+    num_cards = st.number_input("Number of Bingo Cards", min_value=1, max_value=200, value=len(prompts), step=1)
     ## number of rows and columns
     st.markdown("### Number of Rows and Columns")
     ## make columns so it fits on the page

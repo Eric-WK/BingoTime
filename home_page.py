@@ -247,3 +247,51 @@ if save_cards.button("Save Bingo Card"):
     ## balloon notification
     st.balloons()
 
+## add a divider
+st.markdown("""---""")
+## add the section: Draw random numbers 
+st.header("Draw random number")
+# initializing with a random number
+if "rn" not in st.session_state:
+    st.session_state["rn"] = set()
+
+rng_button, rng_text = st.columns(2)
+
+## add a button to draw random numbers
+if rng_button.button("Draw random numbers"):
+    ## get the random numbers
+    random_numbers = np.random.randint(1,101,size=1)[0]
+    if random_numbers in st.session_state.rn: 
+        st.warning("This number has already been drawn!")
+    else: 
+        st.success(f"Number drawn: {random_numbers}")
+        st.success(f"Number of numbers drawn: {len(st.session_state.rn)+1}")
+        st.session_state.rn.add(random_numbers)
+        ## show the numbers that have been drawn
+        st.write(f"Numbers drawn: {sorted(list(st.session_state.rn))}")
+        st.balloons()
+## same for the texts 
+## add a divider
+st.markdown("""---""")
+## add the section: Draw random numbers 
+st.header("Draw random prompt")
+# initializing with a random number
+if "rp" not in st.session_state:
+    st.session_state["rp"] = set()
+
+rng_button, rng_text = st.columns(2)
+
+## add a button to draw random numbers
+if rng_button.button("Draw random prompt"):
+    ## get the random numbers
+    random_text = np.random.choice(prompts,1)[0]
+    if random_text in st.session_state.rp: 
+        st.warning("This text has already been drawn!")
+    else: 
+        st.success(f"Prompt drawn: {random_text}")
+        st.success(f"Number of Prompts drawn: {len(st.session_state.rp)+1}")
+        st.session_state.rp.add(random_text)
+        ## show the numbers that have been drawn
+        st.write(f"Prompt drawn: {sorted(list(st.session_state.rp))}")
+        st.balloons()
+

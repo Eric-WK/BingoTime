@@ -269,7 +269,7 @@ if rng_button.button("Draw random numbers"):
         st.session_state.rn.add(random_numbers)
         ## show the numbers that have been drawn
         st.write(f"Numbers drawn: {sorted(list(st.session_state.rn))}")
-        st.balloons()
+        # st.balloons()
 ## same for the texts 
 ## add a divider
 st.markdown("""---""")
@@ -293,5 +293,5 @@ if rng_button.button("Draw random prompt"):
         st.session_state.rp.add(random_text)
         ## show the numbers that have been drawn
         st.write(f"Prompt drawn: {sorted(list(st.session_state.rp))}")
-        st.balloons()
+        # st.balloons()
 
